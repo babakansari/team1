@@ -1,0 +1,86 @@
+<ix:DetailPage>
+  <ix:DetailSection Title="Fields" meta:resourcekey="DetailSection0" ResourceKey="DetailSection0">
+    <ix:FieldArea>
+<ix:Field For="RecordsToTrain"/>
+<ix:Field For="UserStory"/>
+<ix:Field For="UserName"/>
+    </ix:FieldArea>
+<ix:WorkflowFields/>
+  </ix:DetailSection>
+<ix:WorkflowComments/>
+<ix:WorkflowTracking/>
+<ix:ESignatureHistorySection/>
+  <div>
+    <div>
+<div/>
+      <div>
+Password:
+      </div>
+    </div>
+    <div>
+<input id="Password" type="password" rows="3"/>
+    </div>
+    <div>
+<input id="train" type="button" value="Train Model"/>
+<br/>
+    </div>
+    <div>
+<input id="predict" type="button" value="Predict"/>
+<br/>
+    </div>
+  </div>
+  <ix:JavaScript runat="server">
+    <script type="text/javascript">
+function InvokeTrain(username, password) { 
+        $.ajax({
+         type: "POST",
+         url: Intelex.InvokeWebServiceUrl,
+         dataType: "json",
+         data: { serviceName: "StoryTrainLocal", methodName: "", inputDefinition: '{"username":"'+username+'", "password":"'+password+'", "number":"123"}' },
+         async: true,
+         success: function (result){
+         if(result.Error){
+          alert("Failed To Train\n" + result.Error);
+          return;
+         }
+         resutl_str = JSON.stringify(result );
+         alert("result= " + resutl_str + "\nDone!");
+     }});
+    }
+
+function InvokePredict(username, password, number) { 
+        $.ajax({
+         type: "POST",
+         url: Intelex.InvokeWebServiceUrl,
+         dataType: "json",
+         data: { serviceName: "StoryPredictLocal", methodName: "", inputDefinition: '{"username":"'+username+'", "password":"'+password+'", "number":"'+number+'"}' },
+         async: true,
+         success: function (result){
+         if(result.Error){
+          alert("Failed To Predict\n" + result.Error);
+          return;
+         }
+         //resutl_str = JSON.stringify(result );
+         //alert("result= " + resutl_str + "\nDone!");
+         classifiers = JSON.parse(result);
+         resutl_str = 
+	         "[Logistic:]\r\n -Prediction: " + classifiers.logistic.prediction + ", \tProbability: " + classifiers.logistic.probability + "%\r\n\n"+
+	         "[SVC:]\r\n - Prediction: " + classifiers.svc.prediction + ", \tProbability: " + classifiers.svc.probability + "%\r\n\n" +
+	         "[Linear SVC:]\r\n - Prediction: " + classifiers.linearSVC.prediction + "%\r\n\n" +
+	         "[Ada Boost:]\r\n - Prediction: " + classifiers.adaBoost.prediction + ", \tProbability: " + classifiers.adaBoost.probability + "%\r\n\n";
+	 alert(resutl_str );
+     }});
+    }
+
+    $('#train').on('click',function(){
+      InvokeTrain($('#UserName').val(), $('#Password').val());
+      return;
+    });
+    
+    $('#predict').on('click',function(){
+      InvokePredict($('#UserName').val(), $('#Password').val(), $('#UserStory').val());
+      return;
+    });
+    </script>
+  </ix:JavaScript>
+</ix:DetailPage>

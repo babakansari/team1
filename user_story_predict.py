@@ -46,8 +46,8 @@ def predict_points(classifier, model, username, password, number):
         possibility = round(value,2)*100
         print('[',type(estimator).__name__, '] prediction is:',
               predicted_point, ' points with ', possibility,'% probability')
-        return predicted_point, possibility
+        return {"prediction": predicted_point, "probability":possibility}
     else:
         prediction = one_hot_decode(predict)[0]
         print('[',type(estimator).__name__, '] prediction is: ', prediction, ' points')
-        return prediction, 0
+        return {"prediction": prediction, "probability":100}
