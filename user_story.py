@@ -1,7 +1,8 @@
 from flask_restful import Resource
 from user_story_parameters import UserStoryParameters
 import os.path
-from user_story_train import get_story_points_data, file_name, sheetname
+from user_story_train import get_story_points_data, file_name, sheetname, save_trained_models, load_trained_model
+from user_story_predict import predict_points
 import pandas as pd
 import json
 
@@ -40,11 +41,29 @@ class UserStory(Resource):
                 else:
                     print("Data loaded from file:", file_name)
                     df = pd.read_excel(file_name, sheetname)
-                return json.dumps(df.shape, default=lambda o: o.__dict__)
+                data_shape = json.dumps(df.shape, default=lambda o: o.__dict__)
+
+                save_trained_models(df)
+                return data_shape
 
         class Predict(Resource):
             def get(self):
-                return "GET: Predict US#" + parameters.Number;
+                result = self.predict_points(parameters.UserName, parameters.Password, parameters.Number)
+                return result;
 
             def post(self):
-                return "POST: Predict US#" + parameters.Number;
+                result = self.predict_points(parameters.UserName, parameters.Password, parameters.Number)
+                return result;
+
+            def predict_points(self, username, password, number):
+                load_trained_model(self)
+                logistic = predict_points(self.logistic_classifier, self.model, username, password, number)
+                svc = predict_points(self.svc_classifier, self.model, username, password, number)
+                linearSVC = predict_points(self.linearSVC_classifier, self.model, username, password, number)
+                adaBoost = predict_points(self.adaBoost_classifier, self.model, username, password, number)
+
+                classifiers = {"logistic":logistic, "svc": svc, "linearSVC": linearSVC, "adaBoost": adaBoost};
+
+                result = json.dumps(classifiers, default=lambda o: o.__dict__)
+
+                return result;
