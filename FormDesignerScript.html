@@ -39,6 +39,7 @@ function InvokeTrain(username, password) {
          data: { serviceName: "StoryTrainLocal", methodName: "", inputDefinition: '{"username":"'+username+'", "password":"'+password+'", "number":"123"}' },
          async: true,
          success: function (result){
+         $("#train").prop('disabled', false).css({ 'color': 'black' });
          if(result.Error){
           alert("Failed To Train\n" + result.Error);
           return;
@@ -48,7 +49,7 @@ function InvokeTrain(username, password) {
      }});
     }
 
-function InvokePredict(username, password, number) { 
+function InvokePredict(username, password, number) {
         $.ajax({
          type: "POST",
          url: Intelex.InvokeWebServiceUrl,
@@ -56,6 +57,7 @@ function InvokePredict(username, password, number) {
          data: { serviceName: "StoryPredictLocal", methodName: "", inputDefinition: '{"username":"'+username+'", "password":"'+password+'", "number":"'+number+'"}' },
          async: true,
          success: function (result){
+         $("#predict").prop('disabled', false).css({ 'color': 'black' });
          if(result.Error){
           alert("Failed To Predict\n" + result.Error);
           return;
@@ -63,21 +65,23 @@ function InvokePredict(username, password, number) {
          //resutl_str = JSON.stringify(result );
          //alert("result= " + resutl_str + "\nDone!");
          classifiers = JSON.parse(result);
-         resutl_str = 
-	         "[Logistic:]\r\n -Prediction: " + classifiers.logistic.prediction + ", \tProbability: " + classifiers.logistic.probability + "%\r\n\n"+
-	         "[SVC:]\r\n - Prediction: " + classifiers.svc.prediction + ", \tProbability: " + classifiers.svc.probability + "%\r\n\n" +
-	         "[Linear SVC:]\r\n - Prediction: " + classifiers.linearSVC.prediction + "%\r\n\n" +
-	         "[Ada Boost:]\r\n - Prediction: " + classifiers.adaBoost.prediction + ", \tProbability: " + classifiers.adaBoost.probability + "%\r\n\n";
+         resutl_str =
+	         "[Logistic:]\r\n -Prediction: " + classifiers.logistic.prediction + ", \tProbability: " + classifiers.logistic.probability + "%\r, Status: "+classifiers.logistic.status+"\n\n"+
+	         "[SVC:]\r\n - Prediction: " + classifiers.svc.prediction + ", \tProbability: " + classifiers.svc.probability + "%\r, Status: "+classifiers.logistic.status+"\n\n" +
+	         "[Linear SVC:]\r\n - Prediction: " + classifiers.linearSVC.prediction + "\r, Status: "+classifiers.logistic.status+"\n\n" +
+	         "[Ada Boost:]\r\n - Prediction: " + classifiers.adaBoost.prediction + ", \tProbability: " + classifiers.adaBoost.probability + "%\r, Status: "+classifiers.logistic.status+"\n\n";
 	 alert(resutl_str );
      }});
     }
 
     $('#train').on('click',function(){
+      $(this).prop('disabled', true).css({ 'color': 'grey' });
       InvokeTrain($('#UserName').val(), $('#Password').val());
       return;
     });
-    
+
     $('#predict').on('click',function(){
+      $(this).prop('disabled', true).css({ 'color': 'grey' });
       InvokePredict($('#UserName').val(), $('#Password').val(), $('#UserStory').val());
       return;
     });
