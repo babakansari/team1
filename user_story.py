@@ -5,6 +5,7 @@ from user_story_train import get_story_points_data, file_name, sheetname, save_t
 from user_story_predict import predict_points, define_input
 import pandas as pd
 import json
+from jira import JIRAError
 
 parameters = UserStoryParameters();
 
@@ -60,17 +61,23 @@ class UserStory(Resource):
 
                 load_trained_model(self)
 
-                prediction_df = define_input(self.model, username, password, number)
-                print("\r\n\r\nFeatures: " + str(prediction_df.columns) + "\r\n\r\n")
-                print("\r\n\r\nTotal Features: " + str(len(prediction_df.columns)) + "\r\n\r\n")
+                status = "";
+                logistic = "";
+                svc = "";
+                linearSVC = "";
+                adaBoost = "";
+                try:
+                    prediction_df = define_input(self.model, username, password, number)
+                    print("\r\n\r\nFeatures: " + str(prediction_df.columns) + "\r\n\r\n")
+                    print("\r\n\r\nTotal Features: " + str(len(prediction_df.columns)) + "\r\n\r\n")
 
-                logistic = predict_points(self.logistic_classifier, prediction_df)
-                svc = predict_points(self.svc_classifier, prediction_df)
-                linearSVC = predict_points(self.linearSVC_classifier, prediction_df)
-                adaBoost = predict_points(self.adaBoost_classifier, prediction_df)
+                    logistic = predict_points(self.logistic_classifier, prediction_df)
+                    svc = predict_points(self.svc_classifier, prediction_df)
+                    linearSVC = predict_points(self.linearSVC_classifier, prediction_df)
+                    adaBoost = predict_points(self.adaBoost_classifier, prediction_df)
+                except JIRAError, e:
+                    status = "Jira error: " + str(e)
 
-                classifiers = {"logistic":logistic, "svc": svc, "linearSVC": linearSVC, "adaBoost": adaBoost};
-
+                classifiers = {"status":status, "logistic":logistic, "svc": svc, "linearSVC": linearSVC, "adaBoost": adaBoost};
                 result = json.dumps(classifiers, default=lambda o: o.__dict__)
-
                 return result;
