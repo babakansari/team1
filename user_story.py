@@ -2,7 +2,7 @@ from flask_restful import Resource
 from user_story_parameters import UserStoryParameters
 import os.path
 from user_story_train import get_story_points_data, file_name, sheetname, save_trained_models, load_trained_model
-from user_story_predict import predict_points
+from user_story_predict import predict_points, define_input
 import pandas as pd
 import json
 
@@ -56,11 +56,18 @@ class UserStory(Resource):
                 return result;
 
             def predict_points(self, username, password, number):
+                print('------------< Predict >------------------')
+
                 load_trained_model(self)
-                logistic = predict_points(self.logistic_classifier, self.model, username, password, number)
-                svc = predict_points(self.svc_classifier, self.model, username, password, number)
-                linearSVC = predict_points(self.linearSVC_classifier, self.model, username, password, number)
-                adaBoost = predict_points(self.adaBoost_classifier, self.model, username, password, number)
+
+                prediction_df = define_input(self.model, username, password, number)
+                print("\r\n\r\nFeatures: " + str(prediction_df.columns) + "\r\n\r\n")
+                print("\r\n\r\nTotal Features: " + str(len(prediction_df.columns)) + "\r\n\r\n")
+
+                logistic = predict_points(self.logistic_classifier, prediction_df)
+                svc = predict_points(self.svc_classifier, prediction_df)
+                linearSVC = predict_points(self.linearSVC_classifier, prediction_df)
+                adaBoost = predict_points(self.adaBoost_classifier, prediction_df)
 
                 classifiers = {"logistic":logistic, "svc": svc, "linearSVC": linearSVC, "adaBoost": adaBoost};
 

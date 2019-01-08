@@ -2,7 +2,7 @@ from jira import JIRA
 
 import operator
 
-def _define_input(prediction_df, username, password, number):
+def define_input(prediction_df, username, password, number):
 
     auth_jira = JIRA(server='https://intelex.atlassian.net', auth=(username, password))
     issue = auth_jira.issue(number)
@@ -10,9 +10,11 @@ def _define_input(prediction_df, username, password, number):
     print('Manual prediction was: `', issue.fields.customfield_10049, '`')
 
     for column in prediction_df.columns:
-        prediction_df.loc[0, column] = 0
+        if 'ML-' in column:
+            prediction_df.loc[0, column] = 0
         for label in issue.fields.labels:
-            prediction_df.loc[0, label] = 1
+            if 'ML-' in label:
+                prediction_df.loc[0, label] = 1
     print('Predicting points for `', issue.fields.summary, '` User Story.')
     print('With ' + str(issue.fields.labels) + ' labels ')
 
@@ -32,10 +34,9 @@ def _fibonacci(n):
     elif n == 1: return 1
     else: return _fibonacci(n-1)+_fibonacci(n-2)
 
-def predict_points(classifier, model, username, password, number):
-    print('------------< Predict >------------------')
-    prediction_df = _define_input(model, username, password, number)
+def predict_points(classifier, prediction_df):
 
+    # try:
     estimator = classifier.best_estimator_.estimators_[0]
 
     predict = classifier.predict(prediction_df)
@@ -46,8 +47,11 @@ def predict_points(classifier, model, username, password, number):
         possibility = round(value,2)*100
         print('[',type(estimator).__name__, '] prediction is:',
               predicted_point, ' points with ', possibility,'% probability')
-        return {"prediction": predicted_point, "probability":possibility}
+        return {"prediction": predicted_point, "probability":possibility, "status": "Ok"}
     else:
         prediction = one_hot_decode(predict)[0]
         print('[',type(estimator).__name__, '] prediction is: ', prediction, ' points')
-        return {"prediction": prediction, "probability":100}
+        return {"prediction": prediction, "probability":100, "status": "Ok"}
+    # except Exception, e:
+    #     return {"prediction": -1, "probability": -1, "status": str(e)}
+    #     raise
