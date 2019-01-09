@@ -75,7 +75,7 @@ class UserStory(Resource):
                     svc = predict_points(self.svc_classifier, prediction_df)
                     linearSVC = predict_points(self.linearSVC_classifier, prediction_df)
                     adaBoost = predict_points(self.adaBoost_classifier, prediction_df)
-                except JIRAError, e:
+                except JIRAError as e:
                     status = "Jira error: " + str(e)
 
                 classifiers = {"status":status, "logistic":logistic, "svc": svc, "linearSVC": linearSVC, "adaBoost": adaBoost};
