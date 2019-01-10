@@ -154,7 +154,8 @@ def save_trained_models(df):
     dump(adaBoost_classifier, 'adaBoost.classifier')
 
     model = _save_model(df)
-    dump(model, 'data.model')
+	
+    model.to_pickle('data.model')
 
 
 def load_trained_model(self):
@@ -162,4 +163,5 @@ def load_trained_model(self):
     self.svc_classifier = load('svc.classifier')
     self.linearSVC_classifier = load('linearSVC.classifier')
     self.adaBoost_classifier = load('adaBoost.classifier')
-    self.model = load('data.model')
+    self.model = pd.read_pickle('data.model')
+	

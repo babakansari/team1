@@ -1,5 +1,5 @@
 from jira import JIRA
-
+import json
 import operator
 
 def define_input(prediction_df, username, password, number):
@@ -38,7 +38,7 @@ def predict_points(classifier, prediction_df):
 
     # try:
     estimator = classifier.best_estimator_.estimators_[0]
-
+    result = {}
     predict = classifier.predict(prediction_df)
     if hasattr(estimator, 'predict_proba'):
         predict_prop = classifier.predict_proba(prediction_df)
@@ -47,11 +47,19 @@ def predict_points(classifier, prediction_df):
         possibility = round(value,2)*100
         print('[',type(estimator).__name__, '] prediction is:',
               predicted_point, ' points with ', possibility,'% probability')
-        return {"prediction": predicted_point, "probability":possibility, "status": "Ok"}
+        result['prediction'] = str(predicted_point)
+        result['probability'] = str(possibility)
+        result['status'] = 'Ok'
+        return result
+        #return {"prediction": predicted_point, "probability":possibility, "status": "Ok"}
     else:
         prediction = one_hot_decode(predict)[0]
         print('[',type(estimator).__name__, '] prediction is: ', prediction, ' points')
-        return {"prediction": prediction, "probability":100, "status": "Ok"}
+        result['prediction'] = str(prediction)
+        result['probability'] = "100"
+        result['status'] = 'Ok'
+        return result
+        #return {"prediction": prediction, "probability":100, "status": "Ok"}
     # except Exception, e:
     #     return {"prediction": -1, "probability": -1, "status": str(e)}
     #     raise

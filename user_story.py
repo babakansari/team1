@@ -78,6 +78,13 @@ class UserStory(Resource):
                 except JIRAError as e:
                     status = "Jira error: " + str(e)
 
-                classifiers = {"status":status, "logistic":logistic, "svc": svc, "linearSVC": linearSVC, "adaBoost": adaBoost};
-                result = json.dumps(classifiers, default=lambda o: o.__dict__)
+                #classifiers = {"status":status, "logistic":logistic, "svc": svc, "linearSVC": linearSVC, "adaBoost": adaBoost};
+                #result = json.dumps(classifiers, default=lambda o: o.__dict__)
+                classifiers = {}
+                classifiers['status'] = status
+                classifiers['logistic'] = logistic
+                classifiers['svc'] = svc
+                classifiers['linearSVC'] = linearSVC
+                classifiers['adaBoost'] = adaBoost
+                result = json.dumps(classifiers)
                 return result;

@@ -36,7 +36,7 @@ function InvokeTrain(username, password) {
          type: "POST",
          url: Intelex.InvokeWebServiceUrl,
          dataType: "json",
-         data: { serviceName: "StoryTrainLocal", methodName: "", inputDefinition: '{"username":"'+username+'", "password":"'+password+'", "number":"123"}' },
+         data: { serviceName: "StoryTrainService", methodName: "", inputDefinition: '{"username":"'+username+'", "password":"'+password+'", "number":"123"}' },
          async: true,
          success: function (result){
          $("#train").prop('disabled', false).css({ 'color': 'black' });
@@ -54,19 +54,19 @@ function InvokePredict(username, password, number) {
          type: "POST",
          url: Intelex.InvokeWebServiceUrl,
          dataType: "json",
-         data: { serviceName: "StoryPredictLocal", methodName: "", inputDefinition: '{"username":"'+username+'", "password":"'+password+'", "number":"'+number+'"}' },
+         data: { serviceName: "StoryPredictionService", methodName: "", inputDefinition: '{"username":"'+username+'", "password":"'+password+'", "number":"'+number+'"}' },
          async: true,
          success: function (result){
-         $("#predict").prop('disabled', false).css({ 'color': 'black' });
-         if(result.Error){
-          alert("Failed To Predict\n" + result.Error);
-          return;
-         }
-         //resutl_str = JSON.stringify(result );
-         //alert("result= " + resutl_str + "\nDone!");
-         classifiers = JSON.parse(result);
-         if (classifiers.status){
-	         alert(classifiers.status);
+         	$("#predict").prop('disabled', false).css({ 'color': 'black' });
+         	if(result.Error){
+          		alert("Failed To Predict\n" + result.Error);
+          		return;
+         	}
+         	//resutl_str = JSON.stringify(result );
+         	//alert("result= " + resutl_str + "\nDone!");
+         	classifiers = JSON.parse(result);
+         	if (classifiers.status){
+	         	alert(classifiers.status);
 	         }
 	         else
 	         {
