@@ -35,6 +35,9 @@ class UserStory(Resource):
                 return result
 
             def train_model(self, username, password):
+                if not os.path.exists('persistance'):
+                    os.makedirs('persistance')
+					
                 jiraFileExist = os.path.exists(file_name)
 
                 if not jiraFileExist:

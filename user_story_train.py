@@ -12,12 +12,14 @@ from sklearn.svm import SVC, LinearSVC
 from sklearn.ensemble import AdaBoostClassifier
 from joblib import dump, load
 
+import os
+
 pd.options.mode.chained_assignment = None
 
 warnings.filterwarnings('ignore')
 
 
-file_name = 'Team1JiraReportMain.xlsx'
+file_name = 'persistance/Team1JiraReportMain.xlsx'
 sheetname = 'User Story Prediction'
 target = 'Points'
 
@@ -117,6 +119,10 @@ def _save_model(data):
 
 def save_trained_models(df):
     print('------------< Train >------------------')
+	
+    if not os.path.exists('persistance'):
+	    os.makedirs('persistance')
+	
     X_tr, y_tr, X_te, y_te = train_test_stories(df, 0.40)
 
     grid = {
@@ -127,7 +133,7 @@ def save_trained_models(df):
     logistic = LogisticRegression()
     logistic_classifier = search_best_parameters(logistic, X_tr, y_tr, X_te, grid)
     #logistic = LogisticRegression(**best_params)
-    dump(logistic_classifier, 'logistic.classifier')
+    dump(logistic_classifier, 'persistance/logistic.classifier')
 
     grid={
         'estimator__C': [ 0.1, 1, 10, 100, 100],
@@ -137,7 +143,7 @@ def save_trained_models(df):
     svc = SVC(probability=True)
     svc_classifier = search_best_parameters(svc, X_tr, y_tr, X_te, grid)
     #self.svc = SVC(probability=True, **best_params)
-    dump(svc_classifier, 'svc.classifier')
+    dump(svc_classifier, 'persistance/svc.classifier')
 
     grid = {
         'estimator__C': [0.1, 5, 10, 15],
@@ -146,22 +152,22 @@ def save_trained_models(df):
     linearSVC = LinearSVC()
     linearSVC_classifier = search_best_parameters(linearSVC, X_tr, y_tr, X_te, grid)
     #self.linearSVC = LinearSVC(**best_params)
-    dump(linearSVC_classifier, 'linearSVC.classifier')
+    dump(linearSVC_classifier, 'persistance/linearSVC.classifier')
 
     adaBoost = AdaBoostClassifier(logistic)
     adaBoost_classifier = search_best_parameters(adaBoost, X_tr, y_tr, X_te, {})
     #adaBoost_classifier.fit(X_tr, y_tr).decision_function(X_te)
-    dump(adaBoost_classifier, 'adaBoost.classifier')
+    dump(adaBoost_classifier, 'persistance/adaBoost.classifier')
 
     model = _save_model(df)
 	
-    model.to_pickle('data.model')
+    model.to_pickle('persistance/data.model')
 
 
 def load_trained_model(self):
-    self.logistic_classifier = load('logistic.classifier')
-    self.svc_classifier = load('svc.classifier')
-    self.linearSVC_classifier = load('linearSVC.classifier')
-    self.adaBoost_classifier = load('adaBoost.classifier')
-    self.model = pd.read_pickle('data.model')
+    self.logistic_classifier = load('persistance/logistic.classifier')
+    self.svc_classifier = load('persistance/svc.classifier')
+    self.linearSVC_classifier = load('persistance/linearSVC.classifier')
+    self.adaBoost_classifier = load('persistance/adaBoost.classifier')
+    self.model = pd.read_pickle('persistance/data.model')
 	

@@ -270,3 +270,5 @@ report.html
 *.classifier
 *.model
 *.xlsx
+
+persistance/
